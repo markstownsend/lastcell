@@ -67,13 +67,53 @@
     <Content Include="app.config" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="CSharpFormat">
+      <HintPath>..\..\packages\FSharp.Formatting.2.10.3\lib\net40\CSharpFormat.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FSharp.CodeFormat">
+      <HintPath>..\..\packages\FSharp.Formatting.2.10.3\lib\net40\FSharp.CodeFormat.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FSharp.Compiler.Service">
+      <HintPath>..\..\packages\FSharp.Compiler.Service.0.0.90\lib\net45\FSharp.Compiler.Service.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FSharp.Formatting.Common">
+      <HintPath>..\..\packages\FSharp.Formatting.2.10.3\lib\net40\FSharp.Formatting.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FSharp.Literate">
+      <HintPath>..\..\packages\FSharp.Formatting.2.10.3\lib\net40\FSharp.Literate.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FSharp.Markdown">
+      <HintPath>..\..\packages\FSharp.Formatting.2.10.3\lib\net40\FSharp.Markdown.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FSharp.MetadataFormat">
+      <HintPath>..\..\packages\FSharp.Formatting.2.10.3\lib\net40\FSharp.MetadataFormat.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FSharpVSPowerTools.Core">
+      <HintPath>..\..\packages\FSharpVSPowerTools.Core.1.9.0\lib\net45\FSharpVSPowerTools.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RazorEngine">
+      <HintPath>..\..\packages\FSharp.Formatting.2.10.3\lib\net40\RazorEngine.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Web.Razor">
+      <HintPath>..\..\packages\FSharp.Formatting.2.10.3\lib\net40\System.Web.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Unquote">
       <HintPath>..\..\packages\Unquote.3.0.0\lib\net45\Unquote.dll</HintPath>
       <Private>True</Private>

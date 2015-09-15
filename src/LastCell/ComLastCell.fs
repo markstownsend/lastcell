@@ -1,7 +1,9 @@
-﻿#if INTERACTIVE
+﻿(*** hide ***)
+#if INTERACTIVE
 #r "Microsoft.Office.Interop.Excel"
 #r "System.Runtime.InteropServices"
 #r "Microsoft.Office.Core"
+#r "../../packages/FSharp.Formatting.2.10.3/lib/net40/FSharp.MetadataFormat.dll"
 #else
 module public ComLastCell
 #endif
@@ -11,7 +13,11 @@ open System.IO
 open Microsoft.Office.Interop.Excel
 open System.Runtime.InteropServices
 open Microsoft.Office.Core
+open FSharp.MetadataFormat
 
+(** 
+    Type provides one place to manage the application settings for the Excel instance that hosts the workbooks.
+*)
 type public ExcelHandler (handle : ApplicationClass) = 
     member this.Handle = handle
     member this.BooksCollection = handle.Workbooks
@@ -32,7 +38,9 @@ type public ExcelHandler (handle : ApplicationClass) =
         this.Handle.ScreenUpdating <- false
         this.Handle.DisplayAlerts <- false
     
-
+(** 
+    Basic holder for the results.
+*)
 type public LastCell = 
     {
         mutable LastRow : int
@@ -40,6 +48,9 @@ type public LastCell =
     }
     member this.ToString = "LastRow:" + this.LastRow.ToString() + ";LastCol:" + this.LastCol.ToString()
 
+(** 
+    Basic holder for the results.
+*)
 type public SheetLimits = 
     {
         mutable MaxRow : int
@@ -47,7 +58,7 @@ type public SheetLimits =
     }
     member this.ToString = "MaxRow:" + this.MaxRow.ToString() + ";MaxCol:" + this.MaxCol.ToString()
 
-        
+  
 let p1 (c, _, _) = c
 let p2 (_, c, _) = c
 
@@ -63,7 +74,10 @@ let lastElement (data : int option) =
         | Some var1 -> var1
         | None -> -1        // some error value to indicate an error occurred when trying to find the last[Row|Col]
 
-
+(** 
+    Finds the last row in a worksheet by starting at the first cell and doing a find with 
+    the direction reversed.
+*)
 let FindWorksheetLastRow (sheet : Worksheet) =
     let cellsColl = sheet.Cells 
     //printfn "%s has %i cells" sheet.Name cellsColl.Count
@@ -81,7 +95,11 @@ let FindWorksheetLastRow (sheet : Worksheet) =
         if(not(obj.ReferenceEquals(firstCell, null)) && Marshal.IsComObject(firstCell)) then printfn "Remaining RCW references to firstCell %i " (Marshal.ReleaseComObject(firstCell))
         if(not(obj.ReferenceEquals(lastCell, null)) && Marshal.IsComObject(lastCell)) then printfn "Remaining RCW references to lastCell %i " (Marshal.ReleaseComObject(lastCell)) 
     lastRow
-    
+
+(** 
+    Finds the last column in a worksheet by starting at the first cell and doing a find with 
+    the direction reversed.
+*)    
 let FindWorksheetLastCol (sheet : Worksheet) =
     let cellsColl = sheet.Cells 
     let firstCell = cellsColl.[1,1] :?> Range
@@ -106,6 +124,12 @@ let FindWorksheetLastCell (sheet : Worksheet) =
     if(not(obj.ReferenceEquals(thisSheet, null)) && Marshal.IsComObject(thisSheet)) then printfn "Remaining RCW references to thisSheet %i " (Marshal.ReleaseComObject(thisSheet))
     {LastRow = lastRow; LastCol = lastCol}
 
+(** 
+    Iterates over all the sheets in the workbook looking for the last row and column in each sheet.
+    Then chooses the max of all rows and max of all columns.  In other words the workbook lastcell 
+    is a combination of the last row and last column and they could be on different sheets in in the workbook.
+    I call this the *blended lastcell of the workbook.
+*)
 let FindWorkbookLastCell (workbook : Workbook) = 
     let sheetsColl = workbook.Sheets    
     let lastCells = seq {for sheet in sheetsColl do yield FindWorksheetLastCell (sheet :?> Worksheet)}
@@ -120,6 +144,9 @@ let FindWorkbookLastCell (workbook : Workbook) =
     if(not(obj.ReferenceEquals(sheetsColl, null)) && Marshal.IsComObject(sheetsColl)) then printfn "Remaining RCW references to thisSheet %i" (Marshal.ReleaseComObject(sheetsColl))
     {LastRow = maxRow.LastRow; LastCol = maxCol.LastCol}                   
 
+(** 
+    Gets the extremes of the workbook: max row and max column.
+*)
 let FindWorkbookMaxCell (workbook : Workbook) = 
     let sheetsColl = workbook.Sheets
     let firstSheet = sheetsColl.[1] :?> Worksheet
@@ -133,6 +160,9 @@ let FindWorkbookMaxCell (workbook : Workbook) =
     if(not(obj.ReferenceEquals(sheetsColl, null)) && Marshal.IsComObject(sheetsColl)) then printfn "Remaining RCW references to sheetsColl %i" (Marshal.ReleaseComObject(sheetsColl))
     {MaxRow = maxRows; MaxCol = maxCols}
 
+(** 
+    Top level function to open and process the workbook.
+*)
 let public examineFile (handler : ExcelHandler) filename = 
     let workbooks = handler.Handle.Workbooks
     let mutable workbook = null
@@ -142,6 +172,7 @@ let public examineFile (handler : ExcelHandler) filename =
         try
             handler.Secure() |> ignore
             workbook <- workbooks.Open(filename, Microsoft.Office.Interop.Excel.XlUpdateLinks.xlUpdateLinksNever, false, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, false, Type.Missing, Microsoft.Office.Interop.Excel.XlCorruptLoad.xlNormalLoad)
+            // TODO: open a dummy workbook to set these settings before opening the actual workbook
             handler.Secure() |> ignore
             handler.Perform() |> ignore 
             let lc =  FindWorkbookLastCell workbook
